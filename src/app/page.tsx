@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -15,17 +17,39 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+import {ChangeEvent, useState} from "react";
+import { toast } from "sonner"
+
+
+type Elem = "username" | "password" | "confirmPassword"
+
+type Inputs = {
+    username: string,
+    password: string,
+    confirmPassword?: string
+}
 
 export default function Home() {
+    let inputs: Inputs = {
+        username: "",
+        password: ""
+    }
+
+    let [error, setError] = useState<string>("")
+
+    function onElemChange(e: ChangeEvent<HTMLInputElement>, elem: Elem) {
+        inputs[elem] = e.target.value
+    }
+
     return (
         <>
             <div className={"flex justify-center items-center align-middle h-screen"}>
-                <Tabs defaultValue="account" className="w-[400px]">
+                <Tabs defaultValue="username" className="w-[400px]">
                     <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="account">Login</TabsTrigger>
+                        <TabsTrigger value="username">Login</TabsTrigger>
                         <TabsTrigger value="password">Sign Up</TabsTrigger>
                     </TabsList>
-                    <TabsContent value="account">
+                    <TabsContent value="username">
                         <Card>
                             <CardHeader>
                                 <CardTitle>Login</CardTitle>
@@ -35,16 +59,29 @@ export default function Home() {
                             </CardHeader>
                             <CardContent className="space-y-2">
                                 <div className="space-y-1">
-                                    <Label htmlFor="name">Username</Label>
-                                    <Input id="name" defaultValue="Pedro Duarte"/>
+                                    <Label htmlFor="username">Username</Label>
+                                    <Input id="username" placeholder="Chef Moi" onChange={(e) => {
+                                        onElemChange(e, "username")
+                                    }}/>
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="username">Password</Label>
-                                    <Input id="username" defaultValue="@peduarte"/>
+                                    <Label htmlFor="password">Password</Label>
+                                    <Input id="password" placeholder="@peduarte" onChange={(e) => {
+                                        onElemChange(e, "password")
+                                    }}/>
                                 </div>
                             </CardContent>
                             <CardFooter>
-                                <Button>Login</Button>
+                                <Button onClick={(e) => {
+                                    if (!inputs.username || !inputs.password) {
+                                        toast("Please fill out all fields!", {
+                                            description: "You must fill out all fields to login.",
+                                        })
+                                        return
+                                    }
+
+                                    console.log(inputs)
+                                }}>Login</Button>
                             </CardFooter>
                         </Card>
                     </TabsContent>
@@ -59,19 +96,39 @@ export default function Home() {
                             <CardContent className="space-y-3">
                                 <div className="space-y-1">
                                     <Label htmlFor="current">Username</Label>
-                                    <Input id="current" type="password"/>
+                                    <Input id="username" type="password" onChange={(e) => {
+                                        onElemChange(e, "username")
+                                    }}/>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="new">Password</Label>
-                                    <Input id="new" type="password"/>
+                                    <Label htmlFor="password">Password</Label>
+                                    <Input id="password" type="password" onChange={(e) => {
+                                        onElemChange(e, "password")
+                                    }}/>
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="new">Confirm Password</Label>
-                                    <Input id="new" type="password"/>
+                                    <Label htmlFor="confirm">Confirm Password</Label>
+                                    <Input id="confirm" type="password" onChange={(e) => {
+                                        onElemChange(e, "confirmPassword")
+                                    }}/>
                                 </div>
                             </CardContent>
                             <CardFooter>
-                                <Button>Save password</Button>
+                                <Button onClick={(e) => {
+                                    if (inputs.password !== inputs.confirmPassword) {
+                                        toast("Passwords do not match!", {
+                                            description: "Please try again.",
+                                        })
+                                        return
+                                    }
+
+                                    if (!inputs.username || !inputs.password || !inputs.confirmPassword) {
+                                        toast("Please fill out all fields!", {
+                                            description: "You must fill out all fields to login.",
+                                        })
+                                        return
+                                    }
+                                }}>Sign Up</Button>
                             </CardFooter>
                         </Card>
                     </TabsContent>
