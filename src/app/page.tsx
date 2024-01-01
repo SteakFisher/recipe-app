@@ -19,27 +19,33 @@ import {
 } from "@/components/ui/tabs"
 import {ChangeEvent, useState} from "react";
 import { toast } from "sonner"
+import {createClientComponentClient} from "@supabase/auth-helpers-nextjs";
+import {useRouter} from "next/navigation";
 
 
-type Elem = "username" | "password" | "confirmPassword"
+type Elem = "phone" | "password" | "confirmPassword"
 
 type Inputs = {
-    username: string,
+    phone: string,
     password: string,
     confirmPassword?: string
 }
 
 export default function Home() {
     let inputs: Inputs = {
-        username: "",
+        phone: "",
         password: ""
     }
+
+    const supabase = createClientComponentClient();
 
     let [error, setError] = useState<string>("")
 
     function onElemChange(e: ChangeEvent<HTMLInputElement>, elem: Elem) {
         inputs[elem] = e.target.value
     }
+
+    const router = useRouter()
 
     return (
         <>
@@ -59,9 +65,9 @@ export default function Home() {
                             </CardHeader>
                             <CardContent className="space-y-2">
                                 <div className="space-y-1">
-                                    <Label htmlFor="username">Username</Label>
+                                    <Label htmlFor="username">Phone</Label>
                                     <Input id="username" placeholder="Chef Moi" onChange={(e) => {
-                                        onElemChange(e, "username")
+                                        onElemChange(e, "phone")
                                     }}/>
                                 </div>
                                 <div className="space-y-1">
@@ -72,15 +78,30 @@ export default function Home() {
                                 </div>
                             </CardContent>
                             <CardFooter>
-                                <Button onClick={(e) => {
-                                    if (!inputs.username || !inputs.password) {
+                                <Button onClick={async (e) => {
+                                    if (!inputs.phone || !inputs.password) {
                                         toast("Please fill out all fields!", {
                                             description: "You must fill out all fields to login.",
                                         })
                                         return
                                     }
 
-                                    console.log(inputs)
+                                    let {data, error } = await supabase.auth.signInWithPassword({
+                                        phone: inputs.phone,
+                                        password: inputs.password,
+                                    })
+
+                                    if(error) {
+                                        toast("Error signing up!", {
+                                            description: error.message,
+                                        })
+                                        return
+                                    }
+
+                                    console.log(data)
+                                    if (data) {
+                                        router.push('/dashboard')
+                                    }
                                 }}>Login</Button>
                             </CardFooter>
                         </Card>
@@ -95,9 +116,9 @@ export default function Home() {
                             </CardHeader>
                             <CardContent className="space-y-3">
                                 <div className="space-y-1">
-                                    <Label htmlFor="current">Username</Label>
-                                    <Input id="username" type="password" onChange={(e) => {
-                                        onElemChange(e, "username")
+                                    <Label htmlFor="current">Phone</Label>
+                                    <Input id="username" type="email" onChange={(e) => {
+                                        onElemChange(e, "phone")
                                     }}/>
                                 </div>
                                 <div className="space-y-2">
@@ -114,7 +135,7 @@ export default function Home() {
                                 </div>
                             </CardContent>
                             <CardFooter>
-                                <Button onClick={(e) => {
+                                <Button onClick={async (e) => {
                                     if (inputs.password !== inputs.confirmPassword) {
                                         toast("Passwords do not match!", {
                                             description: "Please try again.",
@@ -122,9 +143,29 @@ export default function Home() {
                                         return
                                     }
 
-                                    if (!inputs.username || !inputs.password || !inputs.confirmPassword) {
+                                    if (!inputs.phone || !inputs.password || !inputs.confirmPassword) {
                                         toast("Please fill out all fields!", {
                                             description: "You must fill out all fields to login.",
+                                        })
+                                        return
+                                    }
+
+                                    if (inputs.password.length < 6  ) {
+                                        toast("Password is too short!", {
+                                            description: "Minimum password length is 6 characters."
+                                        })
+                                        return
+                                    }
+
+                                    const {data, error} = await supabase.auth.signUp({
+                                        phone: inputs.phone,
+                                        password: inputs.password
+                                    })
+                                    console.log(data)
+
+                                    if(error) {
+                                        toast("Error signing up!", {
+                                            description: error.message,
                                         })
                                         return
                                     }
