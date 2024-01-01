@@ -60,7 +60,7 @@ export default function Home() {
                             <CardHeader>
                                 <CardTitle>Login</CardTitle>
                                 <CardDescription>
-                                    Sign Up if you haven't already!
+                                    Sign Up if you haven&apos;t already!
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-2">
