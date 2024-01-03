@@ -1,6 +1,7 @@
 import {Command, CommandInput} from "@/components/ui/command";
 import RecipeCard from "@/components/helpers/RecipeCard";
 import {Recipe} from "@/types/Recipe";
+import {Button} from "@/components/ui/button";
 
 
 export default function ButtonDemo() {
@@ -58,12 +59,16 @@ export default function ButtonDemo() {
 
     return (
         <>
-            <div className={"flex justify-center items-center align-middle p-3"}>
-                <Command className="rounded-lg border shadow-md w-1/3 ">
+            <div className={"flex p-3 justify-between items-center"}>
+                <h1 className={"pl-6"}>
+                    Recipr.
+                </h1>
+                <Command className="rounded-lg border shadow-md  w-1/3">
                     <CommandInput placeholder="Type a command or search..." />
                 </Command>
+                <Button className={"mr-6"}>Add Post</Button>
             </div>
-            
+
             {
                 // Loop through recipes and display them in a grid (4 per row)
                 recipes.map((recipe, divIndex) => {
